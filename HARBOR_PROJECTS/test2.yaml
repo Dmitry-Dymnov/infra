@@ -1,0 +1,13 @@
+####__HARBOR__###
+#GitLab URL
+gitlab_url: http://gitlab.local/testns2
+#Project
+storage_quota: 5 #Квота на проект в Gb
+vulnerability_scanning: false #Сканировать ли автоматом образы при пуше
+public: true #публичный или приватный
+#Account (login/role[projectadmin developer guest maintainer limitedguest]), если пользователь одни можно указывать просто user: ,если пользователей два и более после user нужно указать цифру, как в примере.
+users: 
+  - test-user2/maintainer
+  - test-user3/maintainer
+groups: 
+  - test-group3/maintainer

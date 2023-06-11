@@ -1,0 +1,15 @@
+####__VAULT__###
+#GitLab URL (Если проекта нету в Gitlab, gitlab_url: оставить пустым, тогда roleid и secretid будут выведены в логе пайплайна)
+gitlab_url: 
+#Secrets Engine version (gitlab-ci-kv1, gitlab-ci-kv2, kubernetes или другие в зависимости от того, какие были созданы)
+secrets_engine: gitlab-ci-kv1
+#RO & RW template policies
+rw_policy: 
+  - default-rw
+ro_policy: 
+  - default-ro
+  - test-ro
+#Users & Groups
+users: 
+groups: 
+  - test-group4

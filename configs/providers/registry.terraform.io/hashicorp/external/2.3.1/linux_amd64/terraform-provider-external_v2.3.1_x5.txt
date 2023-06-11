@@ -1,0 +1,1 @@
+Вместо этого файла должен лежать провайдер terraform-provider-external_v2.3.1_x5

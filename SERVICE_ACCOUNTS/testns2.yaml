@@ -1,0 +1,7 @@
+####__K8S_SERVICE_ACCOUNT__###
+#GitLab URL
+gitlab_url: http://gitlab.local/testns2
+#K8S cluster (k8s-test, k8s-prod, ...) comma separator
+k8s_clusters: 
+  - k8s-prod
+  - k8s-test

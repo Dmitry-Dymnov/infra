@@ -1,0 +1,74 @@
+default:
+  image:
+    name: harbor.local:80/library/terraform:0.3
+    entrypoint:
+      - /usr/bin/env
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  cache:
+    key: terraform-install
+    paths:
+      - .terraform
+
+stages:
+  - plan
+  - apply
+
+variables:
+  UI_RUNNERS: UI
+#  TF_LOG: debug
+
+plan:
+  stage: plan
+  variables: 
+    TF_VAR_K8S_PROD_TOKEN:        $K8S_PROD_TOKEN
+    TF_VAR_K8S_TEST_TOKEN:        $K8S_TEST_TOKEN
+    TF_VAR_CI_HARBOR_URL:         $CI_HARBOR_URL
+    TF_VAR_CI_HARBOR_USER:        $CI_HARBOR_USER
+    TF_VAR_CI_HARBOR_PASSWORD:    $CI_HARBOR_PASSWORD
+    TF_VAR_CI_API_V4_URL:         $CI_API_V4_URL
+    TF_VAR_CI_GITLAB_ADMIN_TOKEN: $CI_GITLAB_ADMIN_TOKEN
+    TF_VAR_VAULT_URL:             $CI_VAULT_URL
+    TF_VAR_VAULT_TOKEN:           $CI_VAULT_TOKEN
+    TF_VAR_LDAP_BIND_PASS :       $VAULT_SVC_PASSWORD
+  before_script:
+    - 'mkdir -p .terraform/providers'
+    - 'cp -R configs/providers/* .terraform/providers/'
+    - 'chmod -R +x .terraform/providers/ ./configs/sa_kubernetes_secret.sh'
+    - './configs/sa_kubernetes_secret.sh > sa_kubernetes_secret.tf'
+  script:
+    - 'echo "Stage start time: $(date)"'
+    - terraform init -input=false -plugin-dir=.terraform/providers
+    - terraform validate
+    - terraform plan -out=tfplan -input=false
+  artifacts:
+    paths:
+      - tfplan
+    expire_in: 1 hrs
+  tags:
+    - $UI_RUNNERS
+
+apply:
+  stage: apply
+  variables: 
+    TF_VAR_K8S_PROD_TOKEN:        $K8S_PROD_TOKEN
+    TF_VAR_K8S_TEST_TOKEN:        $K8S_TEST_TOKEN
+    TF_VAR_CI_HARBOR_URL:         $CI_HARBOR_URL
+    TF_VAR_CI_HARBOR_USER:        $CI_HARBOR_USER
+    TF_VAR_CI_HARBOR_PASSWORD:    $CI_HARBOR_PASSWORD
+    TF_VAR_CI_API_V4_URL:         $CI_API_V4_URL
+    TF_VAR_CI_GITLAB_ADMIN_TOKEN: $CI_GITLAB_ADMIN_TOKEN
+    TF_VAR_VAULT_URL:             $CI_VAULT_URL
+    TF_VAR_VAULT_TOKEN:           $CI_VAULT_TOKEN
+    TF_VAR_LDAP_BIND_PASS:        $VAULT_SVC_PASSWORD
+  before_script:
+    - 'mkdir -p .terraform/providers'
+    - 'cp -R configs/providers/* .terraform/providers/'
+    - 'chmod -R +x .terraform/providers/ ./configs/sa_kubernetes_secret.sh'
+    - './configs/sa_kubernetes_secret.sh > sa_kubernetes_secret.tf'
+  script:
+    - terraform apply -input=false -auto-approve tfplan
+  when: manual
+  dependencies:
+    - plan
+  tags:
+    - $UI_RUNNERS

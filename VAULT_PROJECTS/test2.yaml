@@ -1,0 +1,24 @@
+####__VAULT__###
+#GitLab URL (Если проекта нету в Gitlab, gitlab_url: оставить пустым, тогда roleid и secretid будут выведены в логе пайплайна)
+gitlab_url: http://gitlab.local/testns2
+#Secrets Engine version (gitlab-ci-kv1, gitlab-ci-kv2, kubernetes and so forth)
+secrets_engine: gitlab-ci-kv2
+#RO & RW template policies
+rw_policy: 
+  - default-rw
+  - test-rw
+ro_policy: 
+  - default-ro
+#Users & Groups
+users: 
+  - test-user1
+groups: 
+  - test-group2
+  - test-group3/test-ro
+#Дополнительные конфигурации аппролей создаваемых для ro_policy
+optional_configs:
+  default-ro:
+    secret_id_num_uses: "0"
+    token_num_uses: "120"
+    token_ttl: "80" 
+    token_max_ttl: "160"
